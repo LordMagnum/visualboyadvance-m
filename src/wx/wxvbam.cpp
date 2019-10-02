@@ -185,6 +185,25 @@ wxString wxvbamApp::GetAbsolutePath(wxString path)
     return path;
 }
 
+#ifndef NO_ONLINEUPDATES
+#include "../common/version_cpp.h"
+
+#ifdef __WXMSW__
+#include "winsparkle.h"
+#endif // __WXMSW__
+
+static void init_check_for_updates()
+{
+#ifdef __WXMSW__
+    wxString version(vbam_version);
+    //win_sparkle_set_appcast_url("https://github.com/visualboyadvance-m/visualboyadvance-m/data/appcast.xml");
+    win_sparkle_set_appcast_url("https://raw.githubusercontent.com/visualboyadvance-m/visualboyadvance-m/update-checker/data/appcast.xml");
+    win_sparkle_set_app_details(L"visualboyadvance-m", L"VisualBoyAdvance-M", version.c_str());
+    win_sparkle_init();
+#endif // __WXMSW__
+}
+#endif // NO_ONLINEUPDATES
+
 bool wxvbamApp::OnInit()
 {
     // set up logging
@@ -218,6 +237,11 @@ bool wxvbamApp::OnInit()
 
     if (console_mode)
 	return true;
+
+#ifndef NO_ONLINEUPDATES
+    // check for updates
+    init_check_for_updates();
+#endif
 
     // prepare for loading xrc files
     wxXmlResource* xr = wxXmlResource::Get();
@@ -680,6 +704,12 @@ wxvbamApp::~wxvbamApp() {
 	home = NULL;
     }
     delete overrides;
+
+#ifndef NO_ONLINEUPDATES
+#ifdef __WXMSW__
+    win_sparkle_cleanup();
+#endif
+#endif
 }
 
 MainFrame::MainFrame()
