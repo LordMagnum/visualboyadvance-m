@@ -763,6 +763,19 @@ target_link_libraries(
     ${EXTRA_X11_LIBS}
 )
 
+if(WIN32)
+    if(ENABLE_ONLINEUPDATES)
+        include_directories("${CMAKE_SOURCE_DIR}/dependencies/WinSparkle/include")
+        add_library(WinSparkle STATIC IMPORTED)
+        if(AMD64)
+            set_property(TARGET WinSparkle PROPERTY IMPORTED_LOCATION "${CMAKE_SOURCE_DIR}/dependencies/WinSparkle/x64/Release/WinSparkle.lib")
+        else()
+            set_property(TARGET WinSparkle PROPERTY IMPORTED_LOCATION "${CMAKE_SOURCE_DIR}/dependencies/WinSparkle/Release/WinSparkle.lib")
+        endif()
+        target_link_libraries(visualboyadvance-m WinSparkle)
+    endif()
+endif()
+
 if(ENABLE_FFMPEG)
     join("${FFMPEG_LDFLAGS}" " " FFMPEG_LDFLAGS_STR)
 
